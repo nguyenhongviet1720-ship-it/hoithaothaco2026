@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng ký tham gia Hội thao THACO AUTO 2026</title>
-    <!-- Nhúng thư viện Tailwind CSS để làm đẹp giao diện -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -17,11 +16,14 @@
             </h1>
             <p class="text-[17px] font-bold text-[#003b7e] mb-2">Kính chào Quý Anh/Chị đăng ký tham gia Hội thao năm 2026 do THACO AUTO Bắc Ninh tổ chức</p>
             <p class="text-[17px] font-bold text-[#003b7e] mb-2">Thời gian dự kiến: <span class="text-red-600">Thứ 7, ngày 7 tháng 11 năm 2026</span></p>
-            <p class="text-[17px] font-bold text-[#003b7e] mb-2">Địa điểm dự kiến: <a href="#" class="text-red-600 underline">Link map</a></p>
+            
+            <!-- Bạn dán link Google Map thật vào phần href="..." dưới đây -->
+            <p class="text-[17px] font-bold text-[#003b7e] mb-2">Địa điểm dự kiến: <a href="https://maps.app.goo.gl/Thay-Link-Map-Cua-Ban-Vao-Day" target="_blank" class="text-red-600 underline hover:text-red-800">Link map</a></p>
+            
             <p class="text-[17px] font-bold text-[#003b7e] mb-6">Quý Anh/Chị đăng ký thông tin để chương trình diễn ra thành công nhé!</p>
             
-            <!-- Bạn có thể up bức ảnh thư mời hoặc bảng size lên mạng và dán link vào mục src dưới đây -->
-            <img src="https://i.imgur.com/vHq4wz3.jpg" alt="Thư mời và Bảng size áo" class="w-full border rounded">
+            <!-- Đã đổi tên file ảnh để bạn tự up lên GitHub -->
+            <img src="bang-size.jpg" alt="Bảng size áo và Thư mời" class="w-full border rounded">
         </div>
 
         <!-- Cột phải: Form đăng ký -->
@@ -35,6 +37,7 @@
                         <option value="">-- Chọn Showroom --</option>
                         <option value="Bắc Ninh">Bắc Ninh</option>
                         <option value="Bắc Giang">Bắc Giang</option>
+                        <option value="Lạng Sơn">Lạng Sơn</option>
                     </select>
                 </div>
 
@@ -78,7 +81,7 @@
         </div>
     </div>
 
-    <!-- Hộp thoại thông báo thành công (ẩn mặc định) -->
+    <!-- Hộp thoại thông báo -->
     <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-lg shadow-2xl text-center max-w-sm w-full mx-4">
             <div class="text-green-600 text-6xl mb-4">✔</div>
@@ -89,8 +92,7 @@
     </div>
 
     <script>
-        // BƯỚC QUAN TRỌNG: Dán link Web App của bạn vào giữa 2 dấu ngoặc đơn dưới đây
-        const WEB_APP_URL = 'DÁN_LINK_APP_SCRIPT_CỦA_BẠN_VÀO_ĐÂY';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw6acJtYFl2ohVkCDI5ErmeJJNWI8sSrU1PZmiNyv3DyKqMaYR51BjnylTzLTa8U-ICgg/exec';
 
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -108,8 +110,12 @@
                 size: document.getElementById('size').value
             };
 
+            // Đã thêm headers text/plain để sửa lỗi CORS chặn kết nối
             fetch(WEB_APP_URL, {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8',
+                },
                 body: JSON.stringify(formData)
             })
             .then(response => response.json())
@@ -118,10 +124,12 @@
                     document.getElementById('successMessage').innerText = `Cảm ơn Anh/Chị ${formData.hoten} đã đăng ký thành công!`;
                     document.getElementById('successModal').classList.remove('hidden');
                     document.getElementById('registerForm').reset();
+                } else {
+                    alert('Lỗi từ Google Sheets: ' + data.message);
                 }
             })
             .catch(error => {
-                alert('Có lỗi xảy ra hoặc mạng không ổn định, vui lòng thử lại!');
+                alert('Có lỗi xảy ra, vui lòng thử lại! Lỗi: ' + error.message);
             })
             .finally(() => {
                 submitBtn.innerText = originalText;
