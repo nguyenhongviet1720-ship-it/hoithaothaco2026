@@ -25,15 +25,18 @@
 
         <!-- Cột phải: Form đăng ký -->
         <div class="w-full md:w-1/2 flex flex-col justify-center">
-            <h2 class="text-2xl font-bold text-[#003b7e] uppercase mb-6 text-center">ĐĂNG KÝ THAM GIA</h2>
+            <h2 class="text-2xl font-bold text-[#003b7e] uppercase mb-1 text-center">ĐĂNG KÝ THAM GIA</h2>
+            
+            <!-- HIỂN THỊ SỐ LƯỢNG ĐÃ ĐĂNG KÝ -->
+            <p class="text-center text-gray-600 font-medium mb-6">
+                Đã có <span id="soLuongDangKy" class="text-red-600 font-bold text-xl">...</span> người xác nhận tham gia
+            </p>
             
             <form id="registerForm" class="space-y-4">
                 
-                <!-- NÚT TÍCH XÁC NHẬN THAM GIA ĐƠN GIẢN DẠNG TRÒN -->
-                <div class="flex items-center mb-6 p-3 bg-gray-50 border border-gray-200 rounded-md">
-                    <!-- class rounded-full giúp ô checkbox biến thành hình tròn -->
+                <div class="flex items-center mb-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
                     <input type="checkbox" id="xacnhan" class="w-7 h-7 text-[#003b7e] bg-white border-gray-400 rounded-full focus:ring-[#003b7e] cursor-pointer" required>
-                    <label for="xacnhan" class="ml-3 text-[22px] font-normal uppercase text-black cursor-pointer">Xác nhận tham gia <span class="text-red-600">*</span></label>
+                    <label for="xacnhan" class="ml-3 text-[22px] font-bold uppercase text-[#003b7e] cursor-pointer">Xác nhận tham gia <span class="text-red-600">*</span></label>
                 </div>
 
                 <div>
@@ -110,6 +113,26 @@
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw6acJtYFl2ohVkCDI5ErmeJJNWI8sSrU1PZmiNyv3DyKqMaYR51BjnylTzLTa8U-ICgg/exec';
 
+        // Lấy số lượng người đăng ký khi vừa tải trang
+        function loadRegistrationCount() {
+            fetch(WEB_APP_URL)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('soLuongDangKy').innerText = data.count;
+                } else {
+                    document.getElementById('soLuongDangKy').innerText = '0';
+                }
+            })
+            .catch(error => {
+                document.getElementById('soLuongDangKy').innerText = '?';
+            });
+        }
+
+        // Chạy hàm đếm số lượng ngay khi trang web mở lên
+        window.onload = loadRegistrationCount;
+
+        // Xử lý gửi form
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -118,7 +141,6 @@
             submitBtn.innerText = 'ĐANG XỬ LÝ...';
             submitBtn.disabled = true;
 
-            // Xử lý nút tích tròn thành văn bản đổ về Google Sheets
             const trangThaiXacNhan = document.getElementById('xacnhan').checked ? "Đã xác nhận" : "Chưa xác nhận";
 
             const formData = {
@@ -153,6 +175,9 @@
 
                     document.getElementById('successModal').classList.remove('hidden');
                     document.getElementById('registerForm').reset();
+                    
+                    // Cập nhật lại số lượng ngay sau khi đăng ký thành công
+                    loadRegistrationCount();
                 } else {
                     alert('Lỗi từ máy chủ: ' + data.message);
                 }
